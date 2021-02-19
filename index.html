@@ -83,8 +83,19 @@
       // From the 4 CRUD actions, this is the READ action, and uses the GET http method.
       // The main difference from fetchOne() will be the URL you request from; check
       // the writeup to view the URL pattern for fetch one and fetch all
+      let endpoint = document.querySelector('#endpoint').value;
+      let recordFrom = document.getElementById('recordForm');
+      let recordIDcontainer = document.getElementById('recordIDcontainer');
+
       function fetchAll() {
-        // TODO
+        debugger;
+        hideExtraInput();
+
+        fetch(endpoint)
+        .then(res => res.json())
+        .then(data => {
+          displayData(data);
+        })
       }
 
       // This function should fetch one entry from the given endpoint.
@@ -92,23 +103,61 @@
       // The main difference from fetchAll() will be the URL you request from; check
       // the writeup to view the URL pattern for fetch one and fetch all
       function fetchOne() {
-        // TODO
+        debugger;
+        let message = "please type in post id:"
+        let result = window.prompt(message, 1);
+        fetch(endpoint + '\\' + result)
+          .then(res => res.json())
+          .then(data => {
+            displayData(data);
+        })
       }
 
       // This function should use fetch to create one entry in the given endpoint.
       // From the 4 CRUD actions, this is the CREATE action, and uses the POST http method.
       // The main difference from updateRecord() will be the URL you send data to; check
       // the writeup to view the URL pattern for create and update
-      function createRecord() {
-        // TODO
+      function createRecord(action) {
+        debugger;
+        if (action === 'show') {
+          recordFrom.style.display = 'inline';
+        }
+        else {
+          let author = document.querySelector('#author').value;
+          let title = document.querySelector('#title').value;
+          let data = {
+            author, title 
+          }
+          postData(endpoint, data)
+          .then(data => {
+            displayData(data);
+        })
+        }        
       }
 
       // This function should use fetch to update one existing entry in the given endpoint.
       // From the 4 CRUD actions, this is the UPDATE action, and uses the PUT http method.
       // The main difference from createRecord() will be the URL you send data to; check
       // the writeup to view the URL pattern for create and update
-      function updateRecord() {
-        // TODO
+      function updateRecord(action) {
+        debugger;
+        if (action === 'show') {
+          recordFrom.style.display = 'inline';
+          recordIDcontainer.style.display = 'inline';
+        }
+        else {
+          let author = document.querySelector('#author').value;
+          let title = document.querySelector('#title').value;
+          let id = document.querySelector('#recordID').value;
+
+          let data = {
+            author, title 
+          }
+          putData(endpoint + '\\' + id, data)
+          .then(data => {
+            displayData(data);
+        })
+        } 
       }
 
       // This function should use fetch to delete one existing entry in the given endpoint.
@@ -116,8 +165,68 @@
       // The main difference from fetchOne() will be the HTTP method you use to make your
       // request; check the writeup to view the URL pattern for get one and delete. THERE IS NO 
       // delete all, only delete one.
-      function deleteRecord() {
-        // TODO
+      function deleteRecord(action) {
+        if (action === 'show') {
+          recordFrom.style.display = 'inline';
+          recordIDcontainer.style.display = 'inline';
+        }
+        else{
+        let message = "please type in post id:"
+        let result = window.prompt(message, 1);
+        deleteData(endpoint + '\\' + result)
+          .then(data => {
+            displayData(data);
+          });
+        }
+      }
+
+      function hideExtraInput() {
+          recordFrom.style.display = 'none';
+          recordIDcontainer.style.display = 'none';      
+      }
+
+      function displayData(data) {
+        console.log('displayData called.')
+        let output = document.querySelector('#output')
+        output.textContent = JSON.stringify(data);
+      }
+
+      async function postData(url = '', data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        return response.json();
+      }
+
+      async function putData(url = '', data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+          return response.json();
+        }
+        return 'Network Error: ' + response.status;
+      }
+
+      async function deleteData(url = '') {
+        const response = await fetch(url, {
+          method: 'DELETE',
+        });
+        debugger; 
+        if (response.ok) {
+          return response.json();
+        }
+        return 'Network Error: ' + response.status;
       }
 
       window.addEventListener('DOMContentLoaded', () => {
